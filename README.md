@@ -1,3 +1,4 @@
+#### Adapted from Dylan Shade's [code]("https://github.com/dpshade22/CanvasNotionAPI)
 # This program currently requires a few step from the user
 
 ## Canvas
