@@ -1,13 +1,19 @@
-import requests, json
+import json
 
+import requests
+
+courses = {"ECS03": "1bc57f41-8489-47f9-9dfa-f6bffc9ebbe1",
+           "MAT021": "a937c8b2f7bd4c878e0a27dcd8896001",
+           "ENG003": "e239745e2cb24cc087b75ff05384de18",
+           "CLA010": "fe6f284c43b9428bb58274be424dd869"}
 
 class NotionApi:
+
     def __init__(
-        self,
-        notionToken=None,
-        database_id=None,
-        schoolAb=None,
-        version="2021-08-16",
+            self,
+            notionToken=None,
+            database_id=None,
+            schoolAb=None,
     ):
         self.database_id = database_id
         self.notionToken = notionToken
@@ -15,149 +21,70 @@ class NotionApi:
         self.notionHeaders = {
             "Authorization": "Bearer " + notionToken,
             "Content-Type": "application/json",
-            "Notion-Version": "2021-08-16",
+            "Notion-Version": "2022-06-28",
         }
+        self.payload = {"page_size": 20}
 
-    def queryDatabase(self):
-        readUrl = f"https://api.notion.com/v1/databases/{self.database_id}/query"
+    def getAssignments(self):
+        existing = []
+        response = requests.post(f"https://api.notion.com/v1/databases/{self.database_id}/query",
+                                headers=self.notionHeaders, json=self.payload)
+        current_assignments = response.json()["results"]
+        for assignment in current_assignments:
+            existing.append(assignment["properties"]["Name"]["title"][0]["text"]["content"].lower())
+        return existing
 
-        res = requests.request("POST", readUrl, headers=self.notionHeaders)
-        data = res.json()
-
-        with open("./db.json", "w", encoding="utf8") as f:
-            json.dump(data, f, ensure_ascii=False)
-
-        return data
-
-    def test_if_database_id_exists(self):
-        res = requests.request(
-            "GET",
-            f"https://api.notion.com/v1/databases/{self.database_id}/",
-            headers=self.notionHeaders,
-        )
-
-        return json.loads(res.text)["object"] != "error"
-
-    # Creates a new database in page_id page built for Canvas assignments and returns it's database_id
-    def createNewDatabase(self, page_id):
-        newPageData = {
-            "parent": {
-                "type": "page_id",
-                "page_id": page_id,
-            },
-            "icon": {"type": "emoji", "emoji": "🔖"},
-            "cover": {
-                "type": "external",
-                "external": {"url": "https://website.domain/images/image.png"},
-            },
-            "title": [
-                {
-                    "type": "text",
-                    "text": {
-                        "content": "Canvas Assignments",
-                        "link": None,
+    def addAssignments(self, assignments):
+        for assignment in assignments:
+            newPageData = {
+                "parent": {"database_id": self.database_id},
+                "properties": {
+                    "Status": {
+                        "type": "status",
+                        "status": {
+                            "id": "e98f3afe-4456-4d0e-98c2-cde86a914a15",
+                            "name": "Not started",
+                            "color": "default"
+                        }
                     },
-                }
-            ],
-            "properties": {
-                "State": {
-                    "formula": {
-                        "expression": '(dateBetween(prop("Due Date"), now(), "days") == 0) ? "🟧" : ((dateBetween(prop("Due Date"), now(), "days") < 0) ? "🟥" : "🟩")'
-                    }
-                },
-                "Status": {
-                    "select": {
-                        "options": [
-                            {"name": "To Do", "color": "pink"},
-                            {"name": "In Progress", "color": "red"},
-                            {"name": "Completed", "color": "green"},
+                    "Complete": {
+                        "type": "checkbox",
+                        "checkbox": False
+                    },
+                    "Type": {
+                        "type": "select",
+                        "select": {
+                            "id": "938cbacb-5c6c-4a22-a0e9-a6fd2201eac1",
+                            "name": "Homework",
+                            "color": "brown"
+                        }
+                    },
+                    "Due date": {
+                        "type": "date",
+                        "date": {
+                            "start": assignment["date"],
+                            "time_zone": "America/Los_Angeles",
+                        }
+                    },
+                    "Course": {
+                        "type": "relation",
+                        "relation": [{
+                            "id": courses[assignment["class"]]
+                        }]
+                    },
+                    "Name": {
+                        "type": "title",
+                        "title": [
+                            {
+                                "type": "text",
+                                "text": {
+                                    "content": assignment["name"]
+                                }
+                            }
                         ]
                     }
-                },
-                "Assignment": {"title": {}},
-                "Class": {
-                    "type": "select",
-                    "select": {"options": []},
-                },
-                "Due Date": {"date": {}},
-                "URL": {"url": {}},
-                "Notes": {"rich_text": {}},
-            },
-        }
-
-        data = json.dumps(newPageData)
-
-        res = requests.request(
-            "POST",
-            "https://api.notion.com/v1/databases",
-            headers=self.notionHeaders,
-            data=data,
-        )
-
-        print(res.text)
-
-        newDbId = json.loads(res.text).get("id")
-
-        return newDbId
-
-    def createNewDatabaseItem(
-        self,
-        id,
-        className,
-        assignmentName,
-        status,
-        url=None,
-        dueDate=None,
-    ):
-        if dueDate["start"] == None:
-            dueDate = None
-
-        # if status:
-        #     status = "To do"
-        # else:
-        #     status = "Completed"
-
-        createUrl = "https://api.notion.com/v1/pages"
-
-        newPageData = {
-            "parent": {"database_id": self.database_id},
-            "properties": {
-                "Status": {"select": {"name": status, "color": "pink"}},
-                "Assignment": {
-                    "type": "title",
-                    "title": [
-                        {
-                            "text": {
-                                "content": assignmentName,
-                            },
-                        }
-                    ],
-                },
-                "Class": {
-                    "select": {
-                        "name": className,
-                    }
-                },
-                "Due Date": {"date": dueDate},
-                "URL": {
-                    "url": url,
-                },
-            },
-        }
-
-        data = json.dumps(newPageData)
-
-        res = requests.request("POST", createUrl, headers=self.notionHeaders, data=data)
-
-        print(res.text)
-
-        return res
-
-    def parseDatabaseForAssignments(self):
-        urls = []
-
-        if self.queryDatabase().get("results") != None:
-            for item in self.queryDatabase().get("results"):
-                urls.append(item["properties"]["URL"]["url"])
-
-        return urls
+                }
+            }
+            data = json.dumps(newPageData)
+            response = requests.post(f"https://api.notion.com/v1/pages",
+                                     headers=self.notionHeaders, data=data)

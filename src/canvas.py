@@ -1,7 +1,9 @@
 import requests, json
+from datetime import datetime
 from datetime import date
 from dateutil.relativedelta import relativedelta
 from requests.auth import HTTPBasicAuth
+import pytz
 
 
 class Class:
@@ -20,55 +22,13 @@ class CanvasApi:
         self.header = {"Authorization": "Bearer " + self.canvasKey}
         self.courses = {}
 
-    def get_courses_within_six_months(self):
-        params = {
-            "per_page": 200,
-            "include": ["concluded"],
-            "enrollment_state": ["active"],
-        }
-        readUrl = f"https://{self.schoolAb}.com/api/v1/courses"
-        classes = []
-        courses = requests.request(
-            "GET", readUrl, headers=self.header, params=params
-        ).json()
-
-        for course in courses:
-            startDate = ""
-            ndx = 0
-
-            if course.get("start_at") != None:
-                while course.get("start_at")[ndx] != "T":
-                    startDate += course.get("start_at")[ndx]
-                    ndx += 1
-
-                classStartDate = date.fromisoformat(startDate)
-                sixMonthsAgo = date.today() - relativedelta(months=6)
-
-            if classStartDate < sixMonthsAgo:
-                continue
-
-            if course.get("name") != None:
-                name = course.get("name")
-                name = cleanCourseName(name)
-
-                classObj = Class(
-                    course.get("id"),
-                    name,
-                    course.get("enrollment_term_id"),
-                    course.get("assignments"),
-                )
-
-                classes.append(classObj)
-
-        return classes
-
     def get_all_courses(self):
         params = {
             "per_page": 200,
             "include": ["concluded"],
             "enrollment_state": ["active"],
         }
-        readUrl = f"https://{self.schoolAb}.com/api/v1/courses"
+        readUrl = f"https://{self.schoolAb}/api/v1/courses"
         classes = []
         courses = requests.request(
             "GET", readUrl, headers=self.header, params=params
@@ -100,7 +60,7 @@ class CanvasApi:
 
     # Returns a list of all assignment objects for a given course
     def get_assignment_objects(self, courseName, timeframe=None):
-        readUrl = f"https://{self.schoolAb}.com/api/v1/courses/{self.courses[courseName]}/assignments/"
+        readUrl = f"https://{self.schoolAb}/api/v1/courses/{self.courses[courseName]}/assignments/"
         params = {"per_page": 500, "bucket": timeframe}
 
         assignments = requests.request(
@@ -109,56 +69,31 @@ class CanvasApi:
         assignmentList = []
 
         for assignment in assignments:
-            i = 0
-            newDueDate = ""
-            if assignment.get("due_at") == None:
-                assignment["due_at"] = "2021-01-01"
-            else:
-                while assignment["due_at"][i] != "T":
-                    newDueDate += assignment["due_at"][i]
-                    i += 1
-                assignment["due_at"] = newDueDate
+            utc_time_string = assignment["due_at"]
+            # Create a datetime object from the UTC time string
+            utc_datetime = datetime.strptime(utc_time_string, '%Y-%m-%dT%H:%M:%SZ')
 
+            # Set the UTC timezone for the datetime object
+            utc_timezone = pytz.timezone('UTC')
+            utc_datetime = utc_timezone.localize(utc_datetime)
+
+            # Convert the datetime object to Pacific Time
+            pacific_timezone = pytz.timezone('US/Pacific')
+            pacific_datetime = utc_datetime.astimezone(pacific_timezone)
+
+            # Format the Pacific Time as a string
+            pacific_time_string = pacific_datetime.strftime('%Y-%m-%d %H:%M:%S')
+            assignment["due_at"] = pacific_time_string
             assignment["url"] = assignment["html_url"]
             assignmentList.append(assignment)
 
         return assignmentList
 
-    # Prints version of all currently enrolled classes
-    def update_assignment_objects(
-        self, notionAssignmentsList, courseName, timeframe=None
-    ):
-        readUrl = f"https://{self.schoolAb}.com/api/v1/courses/{self.courses[courseName]}/assignments/"
-        params = {"per_page": 500, "bucket": timeframe}
-
-        assignments = requests.request(
-            "GET", readUrl, headers=self.header, params=params
-        ).json()
-        assignmentList = []
-
-        for assignment in assignments:
-            i = 0
-            newDueDate = ""
-            if assignment.get("due_at") == None:
-                assignment["due_at"] = None
-            else:
-                while assignment["due_at"][i] != "T":
-                    newDueDate += assignment["due_at"][i]
-                    i += 1
-
-                newDueDate = date.fromisoformat(newDueDate) - relativedelta(days=1)
-                assignment["due_at"] = str(newDueDate)
-
-            assignment["url"] = assignment["html_url"]
-
-            if assignment["url"] not in notionAssignmentsList:
-                assignmentList.append(assignment)
-
-        return assignmentList
-
     def list_classes_names(self):
-        for course in self.get_course_objects():
-            print(course.name)
+        class_list = []
+        for course in self.get_all_courses():
+            class_list.append(course.name)
+        return class_list
 
 
 def cleanCourseName(name):
