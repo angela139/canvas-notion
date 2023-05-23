@@ -6,11 +6,11 @@ load_dotenv()
 
 
 def main():
-    canvasKey = os.getenv("CANVAS_KEY")
-    notionToken = os.getenv("NOTION_TOKEN")
-    notionPageId = os.getenv("NOTION_PAGE_ID")
-    schoolAb = os.getenv("SCHOOL_URL")
-    database_id = os.getenv("DATABASE_ID")
+    canvasKey = os.environ["CANVAS_KEY"]
+    notionToken = os.environ["NOTION_TOKEN"]
+    notionPageId = os.environ["NOTION_PAGE_ID"]
+    schoolAb = os.environ["SCHOOL_URL"]
+    database_id = os.environ["DATABASE_ID"]
     test_user = User(canvasKey, notionToken, notionPageId, schoolAb, database_id)
 
     existing_assignments = test_user.notionProfile.getAssignments()
@@ -28,7 +28,7 @@ def main():
                 assignments_list.append(assignment)
 
     # Add to Notion
-    # test_user.postDatabase(assignments_list)
+    test_user.postDatabase(assignments_list)
 
 
 if __name__ == "__main__":
