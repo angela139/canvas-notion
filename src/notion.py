@@ -5,7 +5,9 @@ import requests
 courses = {"ECS03": "1bc57f41-8489-47f9-9dfa-f6bffc9ebbe1",
            "MAT021": "a937c8b2f7bd4c878e0a27dcd8896001",
            "ENG003": "e239745e2cb24cc087b75ff05384de18",
-           "CLA010": "fe6f284c43b9428bb58274be424dd869"}
+           "CLA010": "fe6f284c43b9428bb58274be424dd869",
+           "FilmHistory": "3536d74f-067c-4df8-9b08-4ab83b5fe376",
+           "IntroductiontoSociology": "3536d74f-067c-4df8-9b08-4ab83b5fe376"}
 
 class NotionApi:
 

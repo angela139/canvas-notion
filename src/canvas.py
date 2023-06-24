@@ -33,7 +33,6 @@ class CanvasApi:
         courses = requests.request(
             "GET", readUrl, headers=self.header, params=params
         ).json()
-
         for i in courses:
             if i.get("name") != None:
                 name = i.get("name")
