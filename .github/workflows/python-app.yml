@@ -33,7 +33,9 @@ jobs:
       run: python src/main.py
       env:
           CANVAS_KEY: ${{ secrets.CANVAS_KEY }}
+          CCSF_KEY: ${{ secrets.CCSF_KEY }}
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_PAGE_ID: ${{ secrets.NOTION_PAGE_ID }}
           SCHOOL_URL: ${{ secrets.SCHOOL_URL }}
+          CCSF_URL: ${{ secrets.CCSF_URL }}
           DATABASE_ID: ${{ secrets.DATABASE_ID }}
