@@ -39,3 +39,5 @@ jobs:
           SCHOOL_URL: ${{ secrets.SCHOOL_URL }}
           CCSF_URL: ${{ secrets.CCSF_URL }}
           DATABASE_ID: ${{ secrets.DATABASE_ID }}
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+          DISCORD_USER: ${{ secrets.DISCORD_USER }}
