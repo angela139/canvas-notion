@@ -17,11 +17,9 @@ intents.presences = False
 client = discord.Client(intents=intents)
 
 canvasKey = os.environ["CANVAS_KEY"]
-ccsfKey = os.environ["CCSF_KEY"]
 notionToken = os.environ["NOTION_TOKEN"]
 notionPageId = os.environ["NOTION_PAGE_ID"]
 schoolAb = os.environ["SCHOOL_URL"]
-ccsfAb = os.environ["CCSF_URL"]
 database_id = os.environ["DATABASE_ID"]
 
 ucdavis_user = User(canvasKey, notionToken, notionPageId, schoolAb, database_id)
@@ -31,6 +29,7 @@ message_sent = False
 
 
 async def send_reminder(user_id, assignment_name, hours, minutes):
+    global message_sent
     message_sent = True
     user = await client.fetch_user(user_id)
     reminder_string = f"Reminder: Assignment '{assignment_name}' is due in {hours} hours and {minutes} minutes!"
@@ -38,6 +37,7 @@ async def send_reminder(user_id, assignment_name, hours, minutes):
 
 
 async def send_urgent_reminder(user_id, assignment_name, hours, minutes):
+    global message_sent
     message_sent = True
     user = await client.fetch_user(user_id)
     reminder_string = f"{user.mention} Homie hurry up: Assignment '{assignment_name}' is due in {hours} hours and {minutes} minutes!"
