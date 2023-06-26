@@ -18,6 +18,7 @@ def main():
 
     existing_assignments = ucdavis_user.notionProfile.getAssignments()
 
+
     # Get assignments from Canvas for UC Davis
     ucdavis_user.canvasProfile.set_courses_and_id()
 
@@ -44,7 +45,7 @@ def main():
                 assignments_list.append(assignment)
 
     # Add to Notion
-    ucdavis_user.postDatabase(assignments_list)
+    # ucdavis_user.postDatabase(assignments_list)
 
 
 

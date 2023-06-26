@@ -27,6 +27,19 @@ class NotionApi:
         }
         self.payload = {"page_size": 20}
 
+
+    def getDetailAssignments(self):
+        existing = []
+        response = requests.post(f"https://api.notion.com/v1/databases/{self.database_id}/query",
+                                 headers=self.notionHeaders, json=self.payload)
+        current_assignments = response.json()["results"]
+        for assignment in current_assignments:
+            if assignment["properties"]["Due date"]["date"] is not None:
+                modified = {"name": assignment["properties"]["Name"]["title"][0]["text"]["content"],
+                            "date": assignment["properties"]["Due date"]["date"]["start"]}
+                existing.append(modified)
+        return existing
+
     def getAssignments(self):
         existing = []
         response = requests.post(f"https://api.notion.com/v1/databases/{self.database_id}/query",
