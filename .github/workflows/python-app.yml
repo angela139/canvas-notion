@@ -5,7 +5,7 @@ name: Python application
 
 on:
   schedule:
-    - cron: '0 0 * * *' # At 03:00 daily
+    - cron: '0 4 * * *' # At 09:00 daily
 
 jobs:
   build:
@@ -33,7 +33,11 @@ jobs:
       run: python src/main.py
       env:
           CANVAS_KEY: ${{ secrets.CANVAS_KEY }}
+          CCSF_KEY: ${{ secrets.CCSF_KEY }}
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_PAGE_ID: ${{ secrets.NOTION_PAGE_ID }}
           SCHOOL_URL: ${{ secrets.SCHOOL_URL }}
+          CCSF_URL: ${{ secrets.CCSF_URL }}
           DATABASE_ID: ${{ secrets.DATABASE_ID }}
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+          DISCORD_USER: ${{ secrets.DISCORD_USER }}
