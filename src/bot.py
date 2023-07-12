@@ -69,6 +69,7 @@ async def check_assignments():
             user = await client.fetch_user(USER_ID)
             await user.send(wisdom_string)
         # Sleep for an extended period after checking assignments
+        print("Exited")
         await client.close()
 
 
