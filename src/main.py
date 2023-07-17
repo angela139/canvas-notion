@@ -44,8 +44,7 @@ def main():
                 assignments_list.append(assignment)
 
     # Add to Notion
-    print(assignments_list)
-    #ucdavis_user.postDatabase(assignments_list)
+    ucdavis_user.postDatabase(assignments_list)
 
 
 if __name__ == "__main__":
