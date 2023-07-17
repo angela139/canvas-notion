@@ -64,7 +64,8 @@ async def check_assignments():
                                         "'What race of individuals r they'", "'Fuck it, we ball'",
                                         "'In Canada drinking age is 18'",
                                         "'Your top level is my bottom level'", "'I'm cooking chill'",
-                                        "'Menace behavior'"]
+                                        "'Menace behavior'", "'If you wanna buy without looking at the price tag, you need to work without looking at the clock'",
+                                        "'On god fr fr'"]
             wisdom_string = f"Chun-ho-related quote: {angela_quotes_of_the_day[random.randint(0, len(angela_quotes_of_the_day) - 1)]}"
             user = await client.fetch_user(USER_ID)
             await user.send(wisdom_string)
