@@ -9,8 +9,9 @@ courses = {"ECS03": "1bc57f41-8489-47f9-9dfa-f6bffc9ebbe1",
            "FilmHistory": "3536d74f-067c-4df8-9b08-4ab83b5fe376",
            "IntroductiontoSociology": "3536d74f-067c-4df8-9b08-4ab83b5fe376",
            "OrientationLeaderSummerTraining": "3536d74f-067c-4df8-9b08-4ab83b5fe376",
-           "PHY009": "3536d74f-067c-4df8-9b08-4ab83b5fe376",
-           "MGT011": "3536d74f-067c-4df8-9b08-4ab83b5fe376"}
+           "PHY009": "90b1ce965ef248b8be983084826d0f1c",
+           "MGT011": "f1ac21d02ca943a19d27c328a076cf80",
+           "MAT021": "4924c2a0978c4f73956f821c290038ea"}
 
 class NotionApi:
 
