@@ -89,7 +89,7 @@ class NotionApi:
                     "Course": {
                         "type": "relation",
                         "relation": [{
-                            "id": courses[assignment["class"]]
+                            "id": courses.get(assignment["class"], "3536d74f-067c-4df8-9b08-4ab83b5fe376")
                         }]
                     },
                     "Name": {
